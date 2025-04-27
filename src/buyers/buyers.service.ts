@@ -14,16 +14,16 @@ export class BuyersService {
   async create(createBuyerDto: CreateBuyerDto): Promise<Buyer> {
     const { email, password } = createBuyerDto;
 
-    // Check if buyer already exists
+
     const existingBuyer = await this.buyerModel.findOne({ email }).exec();
     if (existingBuyer) {
       throw new ConflictException('Email already exists');
     }
 
-    // Hash password
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new buyer
+    
     const newBuyer = new this.buyerModel({
       ...createBuyerDto,
       password: hashedPassword,
@@ -48,33 +48,38 @@ export class BuyersService {
     return buyer;
   }
 
-  async createFromGoogle(profile: any): Promise<Buyer> {
+
+
+  async createFromGoogle(profile: any): Promise<{ buyer: Buyer; isNewUser: boolean }> {
     const { email, name, sub } = profile;
 
     // Check if user already exists
     let buyer = await this.buyerModel.findOne({ email }).exec();
+    let isNewUser = false;
 
     if (buyer) {
       // Update Google ID if not already set
       if (!buyer.googleId) {
         buyer.googleId = sub;
         buyer.isGoogleAccount = true;
-        return buyer.save();
+        buyer = await buyer.save();
       }
-      return buyer;
+    } else {
+      // Create new buyer from Google data
+      isNewUser = true;
+      const newBuyer = new this.buyerModel({
+        email,
+        fullName: name,
+        companyName: 'Set your company name',  // Default value, user can update later
+        password: await bcrypt.hash(Math.random().toString(36), 10), // Random password
+        googleId: sub,
+        isGoogleAccount: true,
+      });
+
+      buyer = await newBuyer.save();
     }
 
-    // Create new buyer from Google data
-    const newBuyer = new this.buyerModel({
-      email,
-      fullName: name,
-      companyName: 'Set your company name',  // Default value, user can update later
-      password: await bcrypt.hash(Math.random().toString(36), 10), // Random password
-      googleId: sub,
-      isGoogleAccount: true,
-    });
-
-    return newBuyer.save();
+    return { buyer, isNewUser };
   }
 
   async updateProfilePicture(id: string, profilePicturePath: string): Promise<Buyer> {

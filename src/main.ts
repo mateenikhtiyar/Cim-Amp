@@ -16,7 +16,10 @@ async function bootstrap() {
 
     const app = await NestFactory.create(AppModule);
     app.useGlobalPipes(new ValidationPipe());
-    app.enableCors();
+    app.enableCors({
+      origin: 'http://localhost:3000', // your frontend origin
+      credentials: true,               // allow credentials (cookies, auth headers)
+    });
 
     // Setup Swagger
     const config = new DocumentBuilder()

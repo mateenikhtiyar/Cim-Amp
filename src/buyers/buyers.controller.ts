@@ -7,7 +7,8 @@ import {
   Request,
   UseInterceptors,
   UploadedFile,
-  Param
+  Param,
+  Res
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -19,6 +20,9 @@ import { GoogleAuthGuard } from '../auth/guards/google-auth.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { LoginBuyerDto } from './dto/login-buyer.dto';
+import { Buyer } from './schemas/buyer.schema';
+import { GoogleLoginResult } from "../auth/interfaces/google-login-result.interface"
+
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -28,7 +32,6 @@ import {
   ApiBody
 } from '@nestjs/swagger';
 
-// Define custom interface for request with user
 interface RequestWithUser extends Request {
   user?: {
     userId: string;
@@ -36,6 +39,7 @@ interface RequestWithUser extends Request {
     role: string;
   };
 }
+
 
 @ApiTags('buyers')
 @Controller('buyers')
@@ -75,14 +79,43 @@ export class BuyersController {
     // This route initiates Google OAuth flow
   }
 
+
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   @ApiOperation({ summary: 'Google OAuth callback' })
-  @ApiResponse({ status: 200, description: 'Successfully authenticated with Google' })
-  async googleAuthCallback(@Request() req) {
-    return this.authService.loginWithGoogle(req.user);
-  }
+  @ApiResponse({ status: 302, description: 'Redirects to frontend with token' })
+  async googleAuthCallback(@Request() req, @Res() res) {
+    try {
+      if (!req.user) {
+        const frontendUrl = process.env.FRONTEND_URL || 'https://cim-amplify-frontant-cs4h8f2md-mateens-projects-932973d8.vercel.app/';
+        return res.redirect(`${frontendUrl}/auth/error?message=Authentication failed`);
+      }
 
+      const loginResult = await this.authService.loginWithGoogle(req.user) as GoogleLoginResult;
+
+      // Debug what's actually being returned
+      console.log('Login result:', JSON.stringify(loginResult, null, 2));
+      console.log('User ID type:', typeof loginResult.user._id);
+      console.log('User ID value:', loginResult.user._id);
+
+      const frontendUrl = process.env.FRONTEND_URL || 'https://cim-amplify-frontant-cs4h8f2md-mateens-projects-932973d8.vercel.app/';
+      const redirectPath = loginResult.isNewUser ? '/acquireprofile' : '/deals';
+
+      // Use a fallback if _id is undefined
+      const userId = loginResult.user._id ||
+        (loginResult.user as any).id ||
+        'missing-id';
+
+      const redirectUrl = `${frontendUrl}${redirectPath}?token=${loginResult.access_token}&userId=${userId}`;
+
+      console.log('Redirect URL:', redirectUrl);
+      return res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Google callback error:', error);
+      const frontendUrl = process.env.FRONTEND_URL || 'https://cim-amplify-frontant-cs4h8f2md-mateens-projects-932973d8.vercel.app/';
+      return res.redirect(`${frontendUrl}/auth/error?message=${encodeURIComponent(error.message)}`);
+    }
+  }
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiBearerAuth()

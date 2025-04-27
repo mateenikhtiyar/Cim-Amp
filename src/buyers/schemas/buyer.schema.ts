@@ -3,11 +3,13 @@ import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
 export interface BuyerDocument extends Buyer, Document {
+    _id: string;
     toObject(): any;
 }
 
 @Schema()
 export class Buyer {
+   
     @ApiProperty({ description: 'Full name of the buyer' })
     @Prop({ required: true })
     fullName: string;

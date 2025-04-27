@@ -1,4 +1,3 @@
-// src/auth/strategies/google.strategy.ts
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback, Profile, StrategyOptions } from 'passport-google-oauth20';
@@ -7,11 +6,10 @@ import { AuthService } from '../auth.service';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor(private authService: AuthService) {
-        // Explicitly cast the config object to StrategyOptions to satisfy TypeScript
         super({
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: 'http://localhost:3001/auth/google/callback',
+            callbackURL: 'http://localhost:3001/buyers/google/callback',
             scope: ['email', 'profile']
         } as StrategyOptions);
     }

@@ -10,7 +10,7 @@ import { AuthModule } from '../auth/auth.module';
   imports: [
     MongooseModule.forFeature([{ name: Buyer.name, schema: BuyerSchema }]),
     MulterModule.register({ dest: './uploads' }),
-    forwardRef(() => AuthModule), // ✅ Fix circular dependency here too
+    forwardRef(() => AuthModule),
   ],
   controllers: [BuyersController],
   providers: [BuyersService],
