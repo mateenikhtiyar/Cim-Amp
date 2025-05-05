@@ -18,7 +18,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
 
     // Fix CORS configuration
-    let frontendUrl = process.env.FRONTEND_URL || 'https://frontant-cim.vercel.app';
+    let frontendUrl = process.env.FRONTEND_URL || 'https://cim-amp-f.vercel.app/';
     // Remove trailing slash if present
     if (frontendUrl.endsWith('/')) {
       frontendUrl = frontendUrl.slice(0, -1);
