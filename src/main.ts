@@ -16,9 +16,17 @@ async function bootstrap() {
 
     const app = await NestFactory.create(AppModule);
     app.useGlobalPipes(new ValidationPipe());
+
+    // Fix CORS configuration
+    let frontendUrl = process.env.FRONTEND_URL || 'https://frontant-cim.vercel.app';
+    // Remove trailing slash if present
+    if (frontendUrl.endsWith('/')) {
+      frontendUrl = frontendUrl.slice(0, -1);
+    }
+
     app.enableCors({
-      origin: 'http://localhost:3000', // your frontend origin
-      credentials: true,               // allow credentials (cookies, auth headers)
+      origin: frontendUrl,
+      credentials: true,
     });
 
     // Setup Swagger
@@ -35,6 +43,7 @@ async function bootstrap() {
 
     console.log('MongoDB URI:', process.env.MONGODB_URI);
     console.log('Google Client ID configured:', !!process.env.GOOGLE_CLIENT_ID);
+    console.log('Frontend URL configured as:', frontendUrl);
     await app.listen(3001);
     console.log('Application running on port 3001');
     console.log('Swagger documentation available at: http://localhost:3001/api');

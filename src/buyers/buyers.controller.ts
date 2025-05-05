@@ -87,7 +87,7 @@ export class BuyersController {
   async googleAuthCallback(@Request() req, @Res() res) {
     try {
       if (!req.user) {
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const frontendUrl = process.env.FRONTEND_URL;
         return res.redirect(`${frontendUrl}/auth/error?message=Authentication failed`);
       }
 
@@ -98,7 +98,7 @@ export class BuyersController {
       console.log('User ID type:', typeof loginResult.user._id);
       console.log('User ID value:', loginResult.user._id);
 
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const frontendUrl = process.env.FRONTEND_URL;
       const redirectPath = loginResult.isNewUser ? '/acquireprofile' : '/deals';
 
       // Use a fallback if _id is undefined
@@ -112,7 +112,7 @@ export class BuyersController {
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Google callback error:', error);
-      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const frontendUrl = process.env.FRONTEND_URL;
       return res.redirect(`${frontendUrl}/auth/error?message=${encodeURIComponent(error.message)}`);
     }
   }
