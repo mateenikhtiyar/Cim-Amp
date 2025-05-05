@@ -99,7 +99,7 @@ export class BuyersController {
       console.log('User ID value:', loginResult.user._id);
 
       const frontendUrl = process.env.FRONTEND_URL;
-      const redirectPath = loginResult.isNewUser ? 'acquireprofile' : 'deals';
+      const redirectPath = loginResult.isNewUser ? '/acquireprofile' : '/deals';
 
       // Use a fallback if _id is undefined
       const userId = loginResult.user._id ||
