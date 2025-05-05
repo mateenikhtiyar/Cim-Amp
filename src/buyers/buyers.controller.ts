@@ -87,33 +87,30 @@ export class BuyersController {
   async googleAuthCallback(@Request() req, @Res() res) {
     try {
       if (!req.user) {
-        const frontendUrl = process.env.FRONTEND_URL;
+        const frontendUrl = this.configService.get<string>('https://cim-amp-f.vercel.app/');
         return res.redirect(`${frontendUrl}/auth/error?message=Authentication failed`);
       }
 
       const loginResult = await this.authService.loginWithGoogle(req.user) as GoogleLoginResult;
 
-      // Debug what's actually being returned
-      console.log('Login result:', JSON.stringify(loginResult, null, 2));
-      console.log('User ID type:', typeof loginResult.user._id);
-      console.log('User ID value:', loginResult.user._id);
+      // Debug what's being returned (consider removing in production)
+      console.log('Login result user:', loginResult.user);
 
-      const frontendUrl = process.env.FRONTEND_URL;
+      const frontendUrl = this.configService.get<string>('https://cim-amp-f.vercel.app/');
       const redirectPath = loginResult.isNewUser ? '/acquireprofile' : '/deals';
 
-      // Use a fallback if _id is undefined
-      const userId = loginResult.user._id ||
-        (loginResult.user as any).id ||
+      // Get userId, handling different possible formats
+      const userId = loginResult.user._id?.toString() ||
+        (loginResult.user as any).id?.toString() ||
         'missing-id';
 
       const redirectUrl = `${frontendUrl}${redirectPath}?token=${loginResult.access_token}&userId=${userId}`;
 
-      console.log('Redirect URL:', redirectUrl);
       return res.redirect(redirectUrl);
     } catch (error) {
       console.error('Google callback error:', error);
-      const frontendUrl = process.env.FRONTEND_URL;
-      return res.redirect(`${frontendUrl}/auth/error?message=${encodeURIComponent(error.message)}`);
+      const frontendUrl = this.configService.get<string>('https://cim-amp-f.vercel.app/');
+      return res.redirect(`${frontendUrl}/auth/error?message=${encodeURIComponent(error.message || 'Authentication error')}`);
     }
   }
   @UseGuards(JwtAuthGuard)
