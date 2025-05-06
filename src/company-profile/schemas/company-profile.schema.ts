@@ -121,6 +121,10 @@ export class CompanyProfile {
     @Prop({ required: true })
     website: string;
 
+    @ApiProperty({ description: 'Selected currency', example: 'USD' })
+    @Prop({ required: true, default: 'USD' })
+    selectedCurrency: string;
+
     @ApiProperty({ description: 'Contact details', type: [Contact] })
     @Prop({ type: [Object], default: [] })
     contacts: Contact[];

@@ -135,6 +135,10 @@ export class CreateCompanyProfileDto {
     @IsUrl()
     website: string;
 
+    @ApiProperty({ example: 'USD', description: 'Selected currency for monetary values' })
+    @IsString()
+    selectedCurrency: string;
+
     @ApiProperty({ type: [ContactDto], description: 'Contact details' })
     @IsArray()
     @ValidateNested({ each: true })
