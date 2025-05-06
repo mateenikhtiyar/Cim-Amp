@@ -97,10 +97,11 @@ export class TargetCriteriaDto {
     @IsOptional()
     preferredBusinessModels?: string[];
 
-    @ApiProperty({ example: 'Owner(s) Departing', description: 'Management team preference', nullable: true })
-    @IsString()
+    @ApiProperty({ example: ['Owner(s) Departing', 'Willing to Stay'], description: 'Management team preference' })
+    @IsArray()
+    @IsString({ each: true })
     @IsOptional()
-    managementTeamPreference?: string;
+    managementTeamPreference?: string[];
 
     @ApiProperty({ example: 'Looking for established businesses with stable cash flow', description: 'Additional description', nullable: true })
     @IsString()
