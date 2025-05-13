@@ -51,15 +51,10 @@ export class TargetCriteriaDto {
     @IsOptional()
     industrySectors?: string[];
 
-    @ApiProperty({ example: 1000000, description: 'Minimum revenue', nullable: true })
+    @ApiProperty({ example: 5000000, description: 'Revenue', nullable: true })
     @IsNumber()
     @IsOptional()
-    revenueMin?: number;
-
-    @ApiProperty({ example: 10000000, description: 'Maximum revenue', nullable: true })
-    @IsNumber()
-    @IsOptional()
-    revenueMax?: number;
+    revenue?: number;
 
     @ApiProperty({ example: 200000, description: 'Minimum EBITDA', nullable: true })
     @IsNumber()

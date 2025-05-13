@@ -51,13 +51,9 @@ class TargetCriteria {
     @Prop({ type: [String], default: [] })
     industrySectors: string[];
 
-    @ApiProperty({ description: 'Minimum revenue', nullable: true })
+    @ApiProperty({ description: 'Revenue', nullable: true })
     @Prop({ required: false })
-    revenueMin: number;
-
-    @ApiProperty({ description: 'Maximum revenue', nullable: true })
-    @Prop({ required: false })
-    revenueMax: number;
+    revenue: number;
 
     @ApiProperty({ description: 'Minimum EBITDA', nullable: true })
     @Prop({ required: false })
